@@ -52,7 +52,7 @@ object MyModule {
 
   // We can generalize `formatAbs` and `formatFactorial` to
   // accept a _function_ as a parameter
-  def formatResult(name: String, n: Int, f: Int => Int) = {
+  def formatResult(name: String, n: Int, f: Int => Int): String = {
     val msg = "The %s of %d is %d."
     msg.format(name, n, f(n))
   }
@@ -146,7 +146,26 @@ object PolymorphicFunctions {
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+
+  // not good
+  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
+    val a : Seq[Boolean] = for (i: Int <- 0 until as.length - 1) yield {
+      !gt(as(i), as(i + 1))
+    }
+
+    a.reduceLeft(_ && _)
+  }
+
+  //yes
+  def isSorted2[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
+    def go(n: Int) : Boolean = {
+      if(n-1 <= 0) true
+      else if (gt(as(n-1), as(n))) false
+      else go(n -1)
+    }
+
+    go(as.length - 1)
+  }
 
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
@@ -181,4 +200,8 @@ object PolymorphicFunctions {
 
   def compose[A,B,C](f: B => C, g: A => B): A => C =
     ???
+
+  def main(args: Array[String]): Unit = {
+    println(isSorted2(Array(1,7,3,4,5,6), (a: Int, b:Int) => a >= b ))
+  }
 }
